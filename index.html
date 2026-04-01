@@ -6,51 +6,60 @@
 
 <style>
 body {
-  font-family: Arial, sans-serif;
+  font-family: Arial;
   background: #f4f6f8;
-  padding: 40px;
+  padding: 30px;
 }
+
 h1 { text-align: center; }
 
-.container {
-  background: #fff;
-  padding: 25px;
-  max-width: 600px;
+.wrapper {
+  display: flex;
+  gap: 20px;
+  max-width: 1000px;
   margin: auto;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-label { display: block; margin-top: 15px; font-weight: bold; }
+.left, .right {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  flex: 1;
+}
+
+.right {
+  max-width: 300px;
+}
+
+label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
 
 input, select {
   width: 100%;
-  padding: 10px;
+  padding: 8px;
   margin-top: 5px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
 }
 
 button {
-  margin-top: 15px;
+  margin-top: 10px;
   padding: 10px;
-  width: 48%;
-  border: none;
-  background: #007bff;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
+  width: 100%;
 }
 
-button:last-of-type { background: #28a745; }
+.result-box {
+  margin-top: 20px;
+}
 
 pre {
   background: #1e1e1e;
   color: #00ff88;
-  padding: 15px;
-  margin-top: 20px;
+  padding: 10px;
   border-radius: 5px;
   white-space: pre-wrap;
+  margin-bottom: 10px;
 }
 </style>
 
@@ -59,15 +68,15 @@ pre {
 
 <h1>📧 Sales Email Generator</h1>
 
-<div class="container">
+<div class="wrapper">
+
+<!-- LEFT -->
+<div class="left">
 
 <label>Situation</label>
 <select id="situation">
-  <option value="first_contact">First Contact</option>
   <option value="follow_up">Follow-up</option>
-  <option value="quotation">Quotation</option>
-  <option value="delay">Delay Apology</option>
-  <option value="complaint">Complaint Response</option>
+  <option value="first_contact">First Contact</option>
 </select>
 
 <label>Tone</label>
@@ -79,138 +88,205 @@ pre {
 <label>Company</label>
 <input id="company" placeholder="ABC Company">
 
-<label>Product</label>
-<input id="product" placeholder="Your product">
-
 <label>Deadline</label>
 <input id="deadline" placeholder="April 10">
 
 <button onclick="generateEmail()">Generate</button>
-<button onclick="copyText()">Copy</button>
 
-<pre id="result"></pre>
+<div id="results"></div>
+
+</div>
+
+<!-- RIGHT -->
+<div class="right">
+
+<h3>📦 Product Category</h3>
+
+<select id="category">
+  <option value="medical">Medical Device</option>
+  <option value="cosmetic">Cosmetic</option>
+  <option value="general">General Product</option>
+</select>
+
+<label>Product Name</label>
+<input id="product" placeholder="Device / Product">
+
+</div>
 
 </div>
 
 <script>
+const categoryMap = {
+  medical: {
+    term: "medical device",
+    extra: "approved and compliant with regulations"
+  },
+  cosmetic: {
+    term: "cosmetic product",
+    extra: "designed for skin safety and daily use"
+  },
+  general: {
+    term: "product",
+    extra: "high-quality and competitive"
+  }
+};
+
 const templates = {
 
   follow_up: {
-    polite: {
-      subject: [
-        "Just checking in regarding our previous email",
-        "Gentle follow-up on {product}"
-      ],
-      body: `Dear {company},
+    polite: [
+`Dear {company},
 
 I hope you are doing well.
 
-I just wanted to follow up regarding {product}.
-Please let me know if you had a chance to review it.
+Just following up regarding our {product}.
+Please let me know if you had a chance to review.
 
 Looking forward to your feedback.
 
+Best regards,`,
+
+`Dear {company},
+
+I wanted to check in about the {product} we shared.
+Any updates would be appreciated.
+
+Best regards,`,
+
+`Dear {company},
+
+Hope everything is going well.
+
+Following up on our previous discussion about {product}.
+
+Best regards,`,
+
+`Dear {company},
+
+Just a gentle follow-up regarding {product}.
+Looking forward to hearing from you.
+
+Best regards,`,
+
+`Dear {company},
+
+Checking if you had time to review the {product}.
+Your feedback would be appreciated.
+
 Best regards,`
-    },
-    direct: {
-      subject: ["Follow-up on {product}"],
-      body: `Hi {company},
+    ],
+
+    direct: [
+`Hi {company},
 
 Following up on {product}.
-Please share your feedback.
+Please share feedback.
+
+Thanks.`,
+
+`Hi {company},
+
+Any update on {product}?
+
+Thanks.`,
+
+`Hi {company},
+
+Checking status on {product}.
+
+Thanks.`,
+
+`Hi {company},
+
+Please confirm feedback on {product}.
+
+Thanks.`,
+
+`Hi {company},
+
+Following up. Let me know your thoughts.
 
 Thanks.`
-    }
+    ]
   },
 
   first_contact: {
-    polite: {
-      subject: ["Introduction - {product}"],
-      body: `Dear {company},
+    polite: [
+`Dear {company},
 
-I hope this message finds you well.
+We are pleased to introduce our {product}, a {category_term} that is {category_extra}.
 
-We would like to introduce our {product}.
 Please let us know if you are interested.
 
-Best regards,`
-    },
-    direct: {
-      subject: ["{product} proposal"],
-      body: `Hi {company},
+Best regards,`,
 
-We offer {product}.
-Let me know if you're interested.
+`Dear {company},
 
-Thanks.`
-    }
-  },
+We would like to present our {product}.
+It is a {category_term} known for being {category_extra}.
 
-  quotation: {
-    polite: {
-      subject: ["Quotation for {product}"],
-      body: `Dear {company},
+Best regards,`,
 
-Please find our quotation for {product} attached.
+`Dear {company},
 
-Kindly review and let us know your feedback.
+Introducing our {product}, which is {category_extra}.
 
-Best regards,`
-    },
-    direct: {
-      subject: ["Price for {product}"],
-      body: `Hi {company},
+Looking forward to your interest.
 
-Here is the price for {product}.
-Please confirm.
+Best regards,`,
 
-Thanks.`
-    }
-  },
+`Dear {company},
 
-  delay: {
-    polite: {
-      subject: ["Update on delivery schedule"],
-      body: `Dear {company},
+We are reaching out to introduce our {product}.
+It is widely recognized as {category_extra}.
 
-We regret to inform you that the shipment of {product} will be delayed until {deadline}.
+Best regards,`,
 
-We sincerely apologize for any inconvenience caused.
+`Dear {company},
+
+Our {product} is a {category_term} built to be {category_extra}.
+
+Let us know your interest.
 
 Best regards,`
-    },
-    direct: {
-      subject: ["Delay notice"],
-      body: `Hi {company},
+    ],
 
-Shipment of {product} is delayed until {deadline}.
+    direct: [
+`Hi {company},
 
-Apologies for the inconvenience.
+We offer {product}, a {category_term}.
+Let me know if interested.
+
+Thanks.`,
+
+`Hi {company},
+
+Sharing our {product}.
+It's {category_extra}.
+
+Thanks.`,
+
+`Hi {company},
+
+We supply {product}.
+Let me know your thoughts.
+
+Thanks.`,
+
+`Hi {company},
+
+Introducing {product}.
+Interested?
+
+Thanks.`,
+
+`Hi {company},
+
+We provide {product}.
+Let’s discuss.
 
 Thanks.`
-    }
-  },
-
-  complaint: {
-    polite: {
-      subject: ["Regarding your concern"],
-      body: `Dear {company},
-
-Thank you for bringing this issue to our attention.
-
-We are currently reviewing the matter regarding {product} and will update you shortly.
-
-Best regards,`
-    },
-    direct: {
-      subject: ["Issue received"],
-      body: `Hi {company},
-
-We received your complaint regarding {product}.
-We are checking and will update you.
-
-Thanks.`
-    }
+    ]
   }
 
 };
@@ -218,34 +294,29 @@ Thanks.`
 function generateEmail() {
   const situation = document.getElementById("situation").value;
   const tone = document.getElementById("tone").value;
-
   const company = document.getElementById("company").value || "your company";
-  const product = document.getElementById("product").value || "the product";
-  const deadline = document.getElementById("deadline").value || "the scheduled date";
+  const product = document.getElementById("product").value || "product";
 
-  let template = templates[situation][tone];
+  const category = document.getElementById("category").value;
+  const categoryData = categoryMap[category];
 
-  let subject = template.subject[Math.floor(Math.random() * template.subject.length)];
-  let body = template.body;
+  const list = templates[situation][tone];
 
-  const replaceVars = (text) => {
-    return text
+  let resultsHTML = "";
+
+  for (let i = 0; i < 5; i++) {
+    let template = list[i];
+
+    let text = template
       .replace(/{company}/g, company)
       .replace(/{product}/g, product)
-      .replace(/{deadline}/g, deadline);
-  };
+      .replace(/{category_term}/g, categoryData.term)
+      .replace(/{category_extra}/g, categoryData.extra);
 
-  subject = replaceVars(subject);
-  body = replaceVars(body);
+    resultsHTML += `<pre>${text}</pre>`;
+  }
 
-  document.getElementById("result").innerText =
-    "Subject: " + subject + "\\n\\n" + body;
-}
-
-function copyText() {
-  const text = document.getElementById("result").innerText;
-  navigator.clipboard.writeText(text);
-  alert("Copied!");
+  document.getElementById("results").innerHTML = resultsHTML;
 }
 </script>
 
