@@ -2,77 +2,28 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Sales Email Generator</title>
+<title>Email Generator</title>
 
 <style>
-body {
-  font-family: Arial;
-  background: #f4f6f8;
-  padding: 30px;
-}
-
-h1 { text-align: center; }
-
-.wrapper {
-  display: flex;
-  gap: 20px;
-  max-width: 1000px;
-  margin: auto;
-}
-
-.left, .right {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  flex: 1;
-}
-
-.right {
-  max-width: 300px;
-}
-
-label {
-  display: block;
-  margin-top: 10px;
-  font-weight: bold;
-}
-
-input, select {
-  width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-}
-
-button {
-  margin-top: 10px;
-  padding: 10px;
-  width: 100%;
-}
-
-.result-box {
-  margin-top: 20px;
-}
-
-pre {
-  background: #1e1e1e;
-  color: #00ff88;
-  padding: 10px;
-  border-radius: 5px;
-  white-space: pre-wrap;
-  margin-bottom: 10px;
-}
+body { font-family: Arial; background:#f4f6f8; padding:30px; }
+.wrapper { display:flex; gap:20px; max-width:1000px; margin:auto; }
+.left,.right { background:#fff; padding:20px; border-radius:10px; flex:1; }
+.right { max-width:300px; }
+label { display:block; margin-top:10px; font-weight:bold; }
+input,select { width:100%; padding:8px; margin-top:5px; }
+button { margin-top:10px; padding:10px; width:100%; }
+.card { background:#111; color:#0f0; padding:10px; margin-top:10px; border-radius:5px; }
+.copy { background:#28a745; margin-top:5px; }
 </style>
 
 </head>
 <body>
 
-<h1>📧 Sales Email Generator</h1>
+<h2>📧 Sales Email Generator</h2>
 
 <div class="wrapper">
 
-<!-- LEFT -->
 <div class="left">
-
 <label>Situation</label>
 <select id="situation">
   <option value="follow_up">Follow-up</option>
@@ -88,236 +39,158 @@ pre {
 <label>Company</label>
 <input id="company" placeholder="ABC Company">
 
-<label>Deadline</label>
-<input id="deadline" placeholder="April 10">
+<button onclick="generate()">Generate</button>
 
-<button onclick="generateEmail()">Generate</button>
-
-<div id="results"></div>
-
+<div id="result"></div>
 </div>
 
-<!-- RIGHT -->
 <div class="right">
-
-<h3>📦 Product Category</h3>
-
+<h3>Product</h3>
 <select id="category">
   <option value="medical">Medical Device</option>
   <option value="cosmetic">Cosmetic</option>
-  <option value="general">General Product</option>
+  <option value="general">General</option>
 </select>
 
-<label>Product Name</label>
-<input id="product" placeholder="Device / Product">
-
+<input id="product" placeholder="Product name">
 </div>
 
 </div>
 
 <script>
+
 const categoryMap = {
-  medical: {
-    term: "medical device",
-    extra: "approved and compliant with regulations"
-  },
-  cosmetic: {
-    term: "cosmetic product",
-    extra: "designed for skin safety and daily use"
-  },
-  general: {
-    term: "product",
-    extra: "high-quality and competitive"
-  }
+  medical: { term:"medical device", extra:"clinically validated" },
+  cosmetic: { term:"cosmetic product", extra:"safe for daily use" },
+  general: { term:"product", extra:"high quality" }
 };
 
 const templates = {
-
   follow_up: {
-    polite: [
+    polite: {
+      subject: [
+        "Gentle follow-up on {product}",
+        "Checking in regarding {product}",
+        "Any update on {product}?",
+        "Following up on our discussion",
+        "Quick follow-up"
+      ],
+      body: [
 `Dear {company},
 
-I hope you are doing well.
-
-Just following up regarding our {product}.
-Please let me know if you had a chance to review.
-
+Just following up regarding {product}.
 Looking forward to your feedback.
 
 Best regards,`,
 
 `Dear {company},
 
-I wanted to check in about the {product} we shared.
-Any updates would be appreciated.
-
-Best regards,`,
-
-`Dear {company},
-
-Hope everything is going well.
-
-Following up on our previous discussion about {product}.
-
-Best regards,`,
-
-`Dear {company},
-
-Just a gentle follow-up regarding {product}.
-Looking forward to hearing from you.
-
-Best regards,`,
-
-`Dear {company},
-
-Checking if you had time to review the {product}.
-Your feedback would be appreciated.
-
-Best regards,`
-    ],
-
-    direct: [
-`Hi {company},
-
-Following up on {product}.
-Please share feedback.
-
-Thanks.`,
-
-`Hi {company},
-
+Hope you're well.
 Any update on {product}?
 
-Thanks.`,
+Best regards,`,
 
-`Hi {company},
-
-Checking status on {product}.
-
-Thanks.`,
-
-`Hi {company},
-
-Please confirm feedback on {product}.
-
-Thanks.`,
-
-`Hi {company},
-
-Following up. Let me know your thoughts.
-
-Thanks.`
-    ]
-  },
-
-  first_contact: {
-    polite: [
 `Dear {company},
 
-We are pleased to introduce our {product}, a {category_term} that is {category_extra}.
-
-Please let us know if you are interested.
+Checking if you had time to review {product}.
 
 Best regards,`,
 
 `Dear {company},
 
-We would like to present our {product}.
-It is a {category_term} known for being {category_extra}.
+Following up on our previous email.
 
 Best regards,`,
 
 `Dear {company},
 
-Introducing our {product}, which is {category_extra}.
-
-Looking forward to your interest.
-
-Best regards,`,
-
-`Dear {company},
-
-We are reaching out to introduce our {product}.
-It is widely recognized as {category_extra}.
-
-Best regards,`,
-
-`Dear {company},
-
-Our {product} is a {category_term} built to be {category_extra}.
-
-Let us know your interest.
+Would appreciate your feedback on {product}.
 
 Best regards,`
-    ],
+      ]
+    },
 
-    direct: [
+    direct: {
+      subject: [
+        "Follow-up",
+        "Update?",
+        "Status check",
+        "Feedback needed",
+        "Quick check"
+      ],
+      body: [
 `Hi {company},
 
-We offer {product}, a {category_term}.
-Let me know if interested.
+Update on {product}?
 
 Thanks.`,
-
 `Hi {company},
 
-Sharing our {product}.
-It's {category_extra}.
+Any feedback?
 
 Thanks.`,
-
 `Hi {company},
 
-We supply {product}.
-Let me know your thoughts.
+Please confirm status.
 
 Thanks.`,
-
 `Hi {company},
 
-Introducing {product}.
-Interested?
+Following up.
 
 Thanks.`,
-
 `Hi {company},
 
-We provide {product}.
-Let’s discuss.
+Let me know.
 
 Thanks.`
-    ]
+      ]
+    }
   }
-
 };
 
-function generateEmail() {
+function randomPick(arr) {
+  return arr[Math.floor(Math.random()*arr.length)];
+}
+
+function generate() {
   const situation = document.getElementById("situation").value;
   const tone = document.getElementById("tone").value;
   const company = document.getElementById("company").value || "your company";
   const product = document.getElementById("product").value || "product";
 
-  const category = document.getElementById("category").value;
-  const categoryData = categoryMap[category];
+  const category = categoryMap[document.getElementById("category").value];
 
-  const list = templates[situation][tone];
+  const t = templates[situation][tone];
 
-  let resultsHTML = "";
+  let html = "";
 
-  for (let i = 0; i < 5; i++) {
-    let template = list[i];
+  for(let i=0;i<5;i++){
+    let subject = randomPick(t.subject);
+    let body = randomPick(t.body);
 
-    let text = template
-      .replace(/{company}/g, company)
-      .replace(/{product}/g, product)
-      .replace(/{category_term}/g, categoryData.term)
-      .replace(/{category_extra}/g, categoryData.extra);
+    let text = ("Subject: "+subject+"\n\n"+body)
+      .replace(/{company}/g,company)
+      .replace(/{product}/g,product)
+      .replace(/{category_term}/g,category.term)
+      .replace(/{category_extra}/g,category.extra);
 
-    resultsHTML += `<pre>${text}</pre>`;
+    html += `
+      <div class="card">
+        ${text.replace(/\n/g,"<br>")}
+        <button class="copy" onclick="copyText(\`${text}\`)">Copy</button>
+      </div>
+    `;
   }
 
-  document.getElementById("results").innerHTML = resultsHTML;
+  document.getElementById("result").innerHTML = html;
 }
+
+function copyText(text){
+  navigator.clipboard.writeText(text);
+  alert("Copied!");
+}
+
 </script>
 
 </body>
