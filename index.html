@@ -2,32 +2,71 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Email Generator</title>
+<title>Sales Email Generator</title>
 
 <style>
 body { font-family: Arial; background:#f4f6f8; padding:30px; }
-.wrapper { display:flex; gap:20px; max-width:1000px; margin:auto; }
-.left,.right { background:#fff; padding:20px; border-radius:10px; flex:1; }
-.right { max-width:300px; }
-label { display:block; margin-top:10px; font-weight:bold; }
-input,select { width:100%; padding:8px; margin-top:5px; }
-button { margin-top:10px; padding:10px; width:100%; }
-.card { background:#111; color:#0f0; padding:10px; margin-top:10px; border-radius:5px; }
-.copy { background:#28a745; margin-top:5px; }
-</style>
+h1 { text-align:center; }
 
+.wrapper {
+  display:flex;
+  gap:20px;
+  max-width:1100px;
+  margin:auto;
+}
+
+.left,.right {
+  background:#fff;
+  padding:20px;
+  border-radius:10px;
+  flex:1;
+}
+
+.right { max-width:300px; }
+
+label { display:block; margin-top:10px; font-weight:bold; }
+
+input,select {
+  width:100%;
+  padding:8px;
+  margin-top:5px;
+}
+
+button {
+  margin-top:10px;
+  padding:10px;
+  width:100%;
+}
+
+.card {
+  background:#111;
+  color:#0f0;
+  padding:15px;
+  margin-top:15px;
+  border-radius:8px;
+}
+
+.copy {
+  background:#28a745;
+  margin-top:10px;
+}
+
+</style>
 </head>
+
 <body>
 
-<h2>📧 Sales Email Generator</h2>
+<h1>📧 Sales Email Generator</h1>
 
 <div class="wrapper">
 
+<!-- LEFT -->
 <div class="left">
+
 <label>Situation</label>
 <select id="situation">
-  <option value="follow_up">Follow-up</option>
   <option value="first_contact">First Contact</option>
+  <option value="follow_up">Follow-up</option>
 </select>
 
 <label>Tone</label>
@@ -42,17 +81,23 @@ button { margin-top:10px; padding:10px; width:100%; }
 <button onclick="generate()">Generate</button>
 
 <div id="result"></div>
+
 </div>
 
+<!-- RIGHT -->
 <div class="right">
-<h3>Product</h3>
+
+<h3>📦 Product</h3>
+
 <select id="category">
   <option value="medical">Medical Device</option>
   <option value="cosmetic">Cosmetic</option>
   <option value="general">General</option>
 </select>
 
+<label>Product Name</label>
 <input id="product" placeholder="Product name">
+
 </div>
 
 </div>
@@ -60,51 +105,227 @@ button { margin-top:10px; padding:10px; width:100%; }
 <script>
 
 const categoryMap = {
-  medical: { term:"medical device", extra:"clinically validated" },
-  cosmetic: { term:"cosmetic product", extra:"safe for daily use" },
-  general: { term:"product", extra:"high quality" }
+  medical: {
+    term: "medical device",
+    extra: "clinically validated performance, strict regulatory compliance, and high reliability"
+  },
+  cosmetic: {
+    term: "aesthetic solution",
+    extra: "premium quality, proven safety, and strong end-user satisfaction"
+  },
+  general: {
+    term: "innovative product",
+    extra: "excellent performance, competitive pricing, and strong market adaptability"
+  }
 };
 
 const templates = {
+
+  first_contact: {
+    polite: {
+      subject: [
+        "Introduction of our leading {product}",
+        "Partnership opportunity – {product}",
+        "Introducing our globally recognized {product}",
+        "Business proposal regarding {product}",
+        "Potential collaboration – {product}"
+      ],
+
+      body: [
+
+`Dear {company},
+
+I hope this message finds you well.
+
+My name is [Your Name], and I am reaching out from [Your Company], a globally recognized manufacturer specializing in advanced {category_term} solutions.
+
+We would like to introduce our flagship product, {product}, which has gained strong recognition across international markets due to its {category_extra}.
+
+Currently, our products are distributed across multiple regions including Europe, the Middle East, and Asia, and are trusted by a wide range of partners.
+
+We believe this product can bring meaningful value to your portfolio by enhancing both competitiveness and customer satisfaction.
+
+Please let us know if you would be interested in receiving more detailed information such as catalogs, pricing, or samples.
+
+We look forward to exploring potential collaboration opportunities with your company.
+
+Best regards,`,
+
+`Dear {company},
+
+Greetings from [Your Company].
+
+We are pleased to introduce ourselves as a leading supplier of {category_term}, with a solid global presence and proven track record.
+
+Our product, {product}, is widely recognized for its {category_extra}, making it a strong choice in competitive markets.
+
+With increasing demand worldwide, we believe this product could be a valuable addition to your offerings.
+
+We would be happy to provide further details including specifications, certifications, and pricing upon your request.
+
+Looking forward to your kind consideration.
+
+Best regards,`,
+
+`Dear {company},
+
+I hope you are doing well.
+
+We would like to take this opportunity to introduce our company and our key product, {product}.
+
+As a company committed to excellence in {category_term}, we have built a strong reputation based on quality, innovation, and reliability.
+
+Our {product} stands out in the market due to its {category_extra}, and has been well received across global markets.
+
+We are confident that this product can support your business growth and strengthen your competitive edge.
+
+Please feel free to reach out if you would like to explore this opportunity further.
+
+Best regards,`,
+
+`Dear {company},
+
+Hope you are doing well.
+
+We are contacting you to introduce our {product}, a highly competitive {category_term} designed to meet evolving market demands.
+
+With its {category_extra}, our product has been successfully adopted by various partners globally.
+
+We are confident that it can contribute positively to your product portfolio.
+
+Please let us know if you would be interested in further discussion.
+
+Best regards,`,
+
+`Dear {company},
+
+I hope everything is going well.
+
+We would like to introduce our {product}, which represents our commitment to delivering high-quality {category_term} solutions.
+
+Thanks to its {category_extra}, this product has achieved strong market acceptance internationally.
+
+We would appreciate the opportunity to discuss potential cooperation with your company.
+
+Looking forward to your response.
+
+Best regards,`
+      ]
+    },
+
+    direct: {
+      subject: [
+        "{product} proposal",
+        "Business opportunity",
+        "New product introduction",
+        "Quick intro – {product}",
+        "Let’s collaborate"
+      ],
+
+      body: [
+
+`Hi {company},
+
+We supply {product}, a {category_term} known for {category_extra}.
+
+Let me know if you're interested.
+
+Thanks.`,
+
+`Hi {company},
+
+Sharing our {product}.
+It offers {category_extra}.
+
+Happy to discuss.
+
+Thanks.`,
+
+`Hi {company},
+
+We provide {product} with strong global demand.
+
+Let me know your thoughts.
+
+Thanks.`,
+
+`Hi {company},
+
+Introducing {product}.
+Let’s explore potential cooperation.
+
+Thanks.`,
+
+`Hi {company},
+
+We have a competitive {category_term}.
+Interested in details?
+
+Thanks.`
+      ]
+    }
+  },
+
   follow_up: {
     polite: {
       subject: [
-        "Gentle follow-up on {product}",
-        "Checking in regarding {product}",
+        "Gentle follow-up regarding {product}",
+        "Checking in on our previous discussion",
         "Any update on {product}?",
-        "Following up on our discussion",
-        "Quick follow-up"
+        "Following up on our proposal",
+        "Kind reminder regarding {product}"
       ],
+
       body: [
+
 `Dear {company},
 
-Just following up regarding {product}.
-Looking forward to your feedback.
+I hope you are doing well.
+
+I would like to follow up on our previous communication regarding {product}.
+
+We understand you may be busy, but we would greatly appreciate any update you could share.
+
+Please let us know if you require any additional information.
+
+Looking forward to your kind response.
 
 Best regards,`,
 
 `Dear {company},
 
-Hope you're well.
-Any update on {product}?
+Hope everything is going well.
+
+We are writing to kindly follow up regarding {product}.
+
+Your feedback would be highly appreciated as we are keen to move forward.
 
 Best regards,`,
 
 `Dear {company},
 
-Checking if you had time to review {product}.
+I just wanted to check in regarding our previous discussion about {product}.
+
+We remain very interested in working with your company and would be happy to support you further.
+
+Looking forward to your reply.
 
 Best regards,`,
 
 `Dear {company},
 
-Following up on our previous email.
+Following up on our earlier email.
+
+We would appreciate any update you may have regarding {product}.
 
 Best regards,`,
 
 `Dear {company},
 
-Would appreciate your feedback on {product}.
+We hope you are doing well.
+
+This is a gentle reminder regarding {product}.
+We look forward to your feedback.
 
 Best regards,`
       ]
@@ -113,40 +334,47 @@ Best regards,`
     direct: {
       subject: [
         "Follow-up",
-        "Update?",
+        "Any update?",
         "Status check",
-        "Feedback needed",
-        "Quick check"
+        "Quick reminder",
+        "Feedback request"
       ],
+
       body: [
+
 `Hi {company},
 
-Update on {product}?
+Any update on {product}?
 
 Thanks.`,
+
 `Hi {company},
 
-Any feedback?
+Following up. Please share your feedback.
 
 Thanks.`,
+
 `Hi {company},
 
-Please confirm status.
+Checking status on {product}.
 
 Thanks.`,
+
 `Hi {company},
 
-Following up.
+Let me know your thoughts.
 
 Thanks.`,
+
 `Hi {company},
 
-Let me know.
+Quick follow-up.
 
 Thanks.`
       ]
     }
   }
+
 };
 
 function randomPick(arr) {
@@ -154,18 +382,19 @@ function randomPick(arr) {
 }
 
 function generate() {
+
   const situation = document.getElementById("situation").value;
   const tone = document.getElementById("tone").value;
   const company = document.getElementById("company").value || "your company";
   const product = document.getElementById("product").value || "product";
 
   const category = categoryMap[document.getElementById("category").value];
-
   const t = templates[situation][tone];
 
   let html = "";
 
   for(let i=0;i<5;i++){
+
     let subject = randomPick(t.subject);
     let body = randomPick(t.body);
 
