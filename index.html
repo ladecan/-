@@ -1,419 +1,104 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Sales Email Tool</title>
+<title>AI Email Generator</title>
 
 <style>
-body { font-family: Arial; background:#f4f6f8; padding:30px; }
-.wrapper { display:flex; gap:20px; max-width:1100px; margin:auto; }
-.left,.right { background:#fff; padding:20px; border-radius:10px; flex:1; }
-.right { max-width:320px; }
-label { display:block; margin-top:10px; font-weight:bold; }
-input,select,textarea { width:100%; padding:8px; margin-top:5px; }
-button { margin-top:10px; padding:10px; width:100%; cursor:pointer; }
+body {
+  font-family: Arial;
+  background:#f4f6f8;
+  padding:40px;
+}
 
-.card {
+.container {
+  max-width:700px;
+  margin:auto;
+  background:#fff;
+  padding:20px;
+  border-radius:10px;
+}
+
+input, textarea {
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+}
+
+button {
+  margin-top:15px;
+  padding:12px;
+  width:100%;
+  cursor:pointer;
+}
+
+pre {
   background:#111;
   color:#0f0;
   padding:15px;
-  margin-top:15px;
-  border-radius:8px;
-}
-
-.copy { background:#28a745; margin-top:10px; }
-
-.ai-box {
-  background:#222;
-  color:#fff;
-  padding:15px;
-  margin-top:15px;
-  border-radius:8px;
+  margin-top:20px;
+  white-space:pre-wrap;
 }
 </style>
 </head>
 
 <body>
 
-<h2>📧 Smart Sales Email Tool</h2>
+<div class="container">
 
-<div class="wrapper">
+<h2>📧 AI Sales Email Generator</h2>
 
-<div class="left">
-
-<label>Situation</label>
-<select id="situation">
-  <option value="first_contact">First Contact</option>
-  <option value="follow_up">Follow-up</option>
-</select>
-
-<label>Tone</label>
-<select id="tone">
-  <option value="polite">Polite</option>
-  <option value="direct">Direct</option>
-</select>
-
-<label>Your Company</label>
 <input id="myCompany" placeholder="Your Company">
+<input id="clientCompany" placeholder="Client Company">
 
-<label>Client Company</label>
-<input id="company" placeholder="Client Company">
+<textarea id="koreanText" rows="6" placeholder="한국어로 막 써"></textarea>
 
 <button onclick="generate()">Generate Email</button>
 
-<div id="result"></div>
-
-<hr>
-
-<h3>🧠 Korean → Business English</h3>
-
-<textarea id="koreanInput" placeholder="한국어로 쓰면 알아서 비즈니스 영어로 변환"></textarea>
-<button onclick="translateKorean()">Convert</button>
-
-<div id="aiResult"></div>
-
-</div>
-
-<div class="right">
-
-<h3>📦 Product</h3>
-
-<select id="category">
-  <option value="medical">Medical Device</option>
-  <option value="cosmetic">Cosmetic</option>
-  <option value="general">General</option>
-</select>
-
-<label>Product Name</label>
-<input id="product" placeholder="Product name">
-
-</div>
+<pre id="result"></pre>
 
 </div>
 
 <script>
 
-const categoryMap = {
-  medical: {
-    term: "medical device",
-    extra: "clinically validated performance, regulatory compliance, and global reliability"
-  },
-  cosmetic: {
-    term: "aesthetic solution",
-    extra: "premium quality, proven safety, and high customer satisfaction"
-  },
-  general: {
-    term: "innovative product",
-    extra: "excellent performance and competitive market positioning"
-  }
-};
+async function generate(){
 
-const templates = {
-  first_contact: {
-    polite: {
-      subject: [
-        "Introducing our leading {product}",
-        "Partnership opportunity regarding {product}",
-        "Global supplier – {product}",
-        "Business proposal – {product}",
-        "Collaboration opportunity"
-      ],
-      body: [
+  const myCompany = document.getElementById("myCompany").value;
+  const clientCompany = document.getElementById("clientCompany").value;
+  const koreanText = document.getElementById("koreanText").value;
 
-`Dear {company},
+  const prompt = `
+You are a professional international sales manager.
 
-My name is [Your Name] from {myCompany}, a globally recognized supplier of {category_term}.
+Convert the Korean message into a natural, persuasive business email in English.
 
-We would like to introduce our flagship product, {product}, which is known for its {category_extra}.
+- Include subject line
+- Make it professional and global
+- Improve wording (not literal translation)
 
-Our products are currently distributed across multiple regions including Europe, Asia, and the Middle East, and are trusted by numerous partners worldwide.
+Sender: ${myCompany}
+Client: ${clientCompany}
 
-We believe this product can significantly enhance your portfolio and strengthen your competitiveness in the market.
+Message:
+${koreanText}
+`;
 
-Please let us know if you would be interested in receiving further details such as catalogues, pricing, or samples.
-
-We look forward to your response.
-
-Best regards,`,
-
-`Dear {company},
-
-Greetings from {myCompany}.
-
-We are a global supplier specializing in {category_term}, with a strong track record in international markets.
-
-Our product {product} has been well received due to its {category_extra}, making it highly competitive.
-
-We believe this product could bring strong value to your business.
-
-Please let us know if you are interested.
-
-Best regards,`,
-
-`Dear {company},
-
-I hope you are doing well.
-
-We would like to introduce our {product}, a {category_term} designed to deliver {category_extra}.
-
-With growing demand globally, we believe this product is well-positioned in the market.
-
-We would be happy to provide further details upon your request.
-
-Best regards,`,
-
-`Dear {company},
-
-Hope everything is going well.
-
-We are reaching out to introduce our {product}, which has gained strong recognition for its {category_extra}.
-
-We are confident this product can support your business growth.
-
-Please let us know your interest.
-
-Best regards,`,
-
-`Dear {company},
-
-We would like to present our {product}, a highly competitive {category_term} known for {category_extra}.
-
-We believe this product can be a strong addition to your portfolio.
-
-Looking forward to your reply.
-
-Best regards,`
-      ]
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer 여기에_니_API키"
     },
-
-    direct: {
-      subject: [
-        "{product} proposal",
-        "Quick intro",
-        "New product",
-        "Business opportunity",
-        "Let’s collaborate"
-      ],
-      body: [
-
-`Hi {company},
-
-We supply {product}, a {category_term} known for {category_extra}.
-
-Let me know if interested.
-
-Thanks.`,
-
-`Hi {company},
-
-Sharing our {product}. It offers {category_extra}.
-
-Happy to discuss.
-
-Thanks.`,
-
-`Hi {company},
-
-We provide {product} with strong global demand.
-
-Let me know your thoughts.
-
-Thanks.`,
-
-`Hi {company},
-
-Introducing {product}. Let’s explore collaboration.
-
-Thanks.`,
-
-`Hi {company},
-
-We have a competitive {category_term}.
-
-Interested?
-
-Thanks.`
-      ]
-    }
-  },
-
-  follow_up: {
-    polite: {
-      subject: [
-        "Gentle follow-up",
-        "Checking in",
-        "Any update?",
-        "Follow-up on our proposal",
-        "Kind reminder"
-      ],
-      body: [
-
-`Dear {company},
-
-I hope you are doing well.
-
-I would like to follow up regarding our previous discussion about {product}.
-
-We would greatly appreciate any update you may have.
-
-Looking forward to your reply.
-
-Best regards,`,
-
-`Dear {company},
-
-Hope everything is going well.
-
-Just checking if you had time to review our proposal.
-
-Best regards,`,
-
-`Dear {company},
-
-Following up on our earlier communication.
-
-Please let us know your feedback.
-
-Best regards,`,
-
-`Dear {company},
-
-We remain very interested in working with you.
-
-Please share your thoughts when convenient.
-
-Best regards,`,
-
-`Dear {company},
-
-This is a gentle reminder regarding our previous email.
-
-Looking forward to your response.
-
-Best regards,`
-      ]
-    },
-
-    direct: {
-      subject: [
-        "Follow-up",
-        "Update?",
-        "Status check",
-        "Reminder",
-        "Feedback needed"
-      ],
-      body: [
-
-`Hi {company},
-
-Any update on {product}?
-
-Thanks.`,
-
-`Hi {company},
-
-Following up. Please share feedback.
-
-Thanks.`,
-
-`Hi {company},
-
-Checking status.
-
-Thanks.`,
-
-`Hi {company},
-
-Quick reminder.
-
-Thanks.`,
-
-`Hi {company},
-
-Let me know.
-
-Thanks.`
-      ]
-    }
-  }
-};
-
-function randomPick(arr){
-  return arr[Math.floor(Math.random()*arr.length)];
-}
-
-function generate(){
-
-  const situation = document.getElementById("situation").value;
-  const tone = document.getElementById("tone").value;
-  const myCompany = document.getElementById("myCompany").value || "our company";
-  const company = document.getElementById("company").value || "your company";
-  const product = document.getElementById("product").value || "product";
-
-  const category = categoryMap[document.getElementById("category").value];
-  const t = templates[situation][tone];
-
-  let html = "";
-
-  for(let i=0;i<5;i++){
-
-    let subject = randomPick(t.subject);
-    let body = randomPick(t.body);
-
-    let text = ("Subject: "+subject+"\n\n"+body)
-      .replace(/{company}/g,company)
-      .replace(/{product}/g,product)
-      .replace(/{myCompany}/g,myCompany)
-      .replace(/{category_term}/g,category.term)
-      .replace(/{category_extra}/g,category.extra);
-
-    html += `
-      <div class="card">
-        ${text.replace(/\n/g,"<br>")}
-        <button class="copy" onclick="copyText(\`${text}\`)">Copy</button>
-      </div>
-    `;
-  }
-
-  document.getElementById("result").innerHTML = html;
-}
-
-/* 번역 (룰 기반) */
-function translateKorean(){
-
-  const input = document.getElementById("koreanInput").value;
-
-  let output = "";
-  let explanation = "";
-
-  if(input.includes("답장")){
-    output = "We would appreciate your prompt response.";
-    explanation = "직설 대신 정중한 요청으로 변환";
-  }
-  else if(input.includes("검토")){
-    output = "Please let us know your thoughts after review.";
-    explanation = "부담을 줄이는 표현";
-  }
-  else if(input.includes("관심")){
-    output = "Please let us know if you would be interested.";
-    explanation = "표준 CTA 표현";
-  }
-  else{
-    output = "We would appreciate your feedback regarding this matter.";
-    explanation = "일반적인 비즈니스 표현";
-  }
-
-  document.getElementById("aiResult").innerHTML = `
-    <div class="ai-box">
-    <b>EN:</b><br>${output}<br><br>
-    <b>Why:</b><br>${explanation}
-    </div>
-  `;
-}
-
-function copyText(text){
-  navigator.clipboard.writeText(text);
-  alert("Copied!");
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+
+  const data = await res.json();
+
+  document.getElementById("result").innerText =
+    data.choices?.[0]?.message?.content || "Error";
 }
 
 </script>
