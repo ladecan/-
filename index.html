@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Sales Email Generator</title>
+<title>Sales Email Tool</title>
 
 <style>
 body { font-family: Arial; background:#f4f6f8; padding:30px; }
@@ -11,7 +11,7 @@ body { font-family: Arial; background:#f4f6f8; padding:30px; }
 .right { max-width:320px; }
 label { display:block; margin-top:10px; font-weight:bold; }
 input,select,textarea { width:100%; padding:8px; margin-top:5px; }
-button { margin-top:10px; padding:10px; width:100%; }
+button { margin-top:10px; padding:10px; width:100%; cursor:pointer; }
 
 .card {
   background:#111;
@@ -54,10 +54,10 @@ button { margin-top:10px; padding:10px; width:100%; }
 </select>
 
 <label>Your Company</label>
-<input id="myCompany" placeholder="Your Company Name">
+<input id="myCompany" placeholder="Your Company">
 
 <label>Client Company</label>
-<input id="company" placeholder="ABC Company">
+<input id="company" placeholder="Client Company">
 
 <button onclick="generate()">Generate Email</button>
 
@@ -65,10 +65,10 @@ button { margin-top:10px; padding:10px; width:100%; }
 
 <hr>
 
-<h3>🧠 AI-style Translator</h3>
+<h3>🧠 Korean → Business English</h3>
 
-<textarea id="koreanInput" placeholder="한국어로 하고 싶은 말 입력"></textarea>
-<button onclick="translateKorean()">Convert to Business English</button>
+<textarea id="koreanInput" placeholder="한국어로 쓰면 알아서 비즈니스 영어로 변환"></textarea>
+<button onclick="translateKorean()">Convert</button>
 
 <div id="aiResult"></div>
 
@@ -96,66 +96,289 @@ button { margin-top:10px; padding:10px; width:100%; }
 const categoryMap = {
   medical: {
     term: "medical device",
-    extra: "clinically validated performance and strict regulatory compliance"
+    extra: "clinically validated performance, regulatory compliance, and global reliability"
   },
   cosmetic: {
     term: "aesthetic solution",
-    extra: "premium quality and proven safety"
+    extra: "premium quality, proven safety, and high customer satisfaction"
   },
   general: {
     term: "innovative product",
-    extra: "strong performance and competitive pricing"
+    extra: "excellent performance and competitive market positioning"
   }
 };
 
 const templates = {
   first_contact: {
     polite: {
-      subject: ["Introducing our {product}", "Partnership opportunity"],
-      body: [`Dear {company},
+      subject: [
+        "Introducing our leading {product}",
+        "Partnership opportunity regarding {product}",
+        "Global supplier – {product}",
+        "Business proposal – {product}",
+        "Collaboration opportunity"
+      ],
+      body: [
 
-My name is [Your Name] from {myCompany}, a global supplier of {category_term}.
+`Dear {company},
 
-We would like to introduce our {product}, known for its {category_extra}.
+My name is [Your Name] from {myCompany}, a globally recognized supplier of {category_term}.
 
-We believe this product can bring strong value to your portfolio.
+We would like to introduce our flagship product, {product}, which is known for its {category_extra}.
+
+Our products are currently distributed across multiple regions including Europe, Asia, and the Middle East, and are trusted by numerous partners worldwide.
+
+We believe this product can significantly enhance your portfolio and strengthen your competitiveness in the market.
+
+Please let us know if you would be interested in receiving further details such as catalogues, pricing, or samples.
+
+We look forward to your response.
+
+Best regards,`,
+
+`Dear {company},
+
+Greetings from {myCompany}.
+
+We are a global supplier specializing in {category_term}, with a strong track record in international markets.
+
+Our product {product} has been well received due to its {category_extra}, making it highly competitive.
+
+We believe this product could bring strong value to your business.
 
 Please let us know if you are interested.
 
-Best regards,`]
+Best regards,`,
+
+`Dear {company},
+
+I hope you are doing well.
+
+We would like to introduce our {product}, a {category_term} designed to deliver {category_extra}.
+
+With growing demand globally, we believe this product is well-positioned in the market.
+
+We would be happy to provide further details upon your request.
+
+Best regards,`,
+
+`Dear {company},
+
+Hope everything is going well.
+
+We are reaching out to introduce our {product}, which has gained strong recognition for its {category_extra}.
+
+We are confident this product can support your business growth.
+
+Please let us know your interest.
+
+Best regards,`,
+
+`Dear {company},
+
+We would like to present our {product}, a highly competitive {category_term} known for {category_extra}.
+
+We believe this product can be a strong addition to your portfolio.
+
+Looking forward to your reply.
+
+Best regards,`
+      ]
+    },
+
+    direct: {
+      subject: [
+        "{product} proposal",
+        "Quick intro",
+        "New product",
+        "Business opportunity",
+        "Let’s collaborate"
+      ],
+      body: [
+
+`Hi {company},
+
+We supply {product}, a {category_term} known for {category_extra}.
+
+Let me know if interested.
+
+Thanks.`,
+
+`Hi {company},
+
+Sharing our {product}. It offers {category_extra}.
+
+Happy to discuss.
+
+Thanks.`,
+
+`Hi {company},
+
+We provide {product} with strong global demand.
+
+Let me know your thoughts.
+
+Thanks.`,
+
+`Hi {company},
+
+Introducing {product}. Let’s explore collaboration.
+
+Thanks.`,
+
+`Hi {company},
+
+We have a competitive {category_term}.
+
+Interested?
+
+Thanks.`
+      ]
+    }
+  },
+
+  follow_up: {
+    polite: {
+      subject: [
+        "Gentle follow-up",
+        "Checking in",
+        "Any update?",
+        "Follow-up on our proposal",
+        "Kind reminder"
+      ],
+      body: [
+
+`Dear {company},
+
+I hope you are doing well.
+
+I would like to follow up regarding our previous discussion about {product}.
+
+We would greatly appreciate any update you may have.
+
+Looking forward to your reply.
+
+Best regards,`,
+
+`Dear {company},
+
+Hope everything is going well.
+
+Just checking if you had time to review our proposal.
+
+Best regards,`,
+
+`Dear {company},
+
+Following up on our earlier communication.
+
+Please let us know your feedback.
+
+Best regards,`,
+
+`Dear {company},
+
+We remain very interested in working with you.
+
+Please share your thoughts when convenient.
+
+Best regards,`,
+
+`Dear {company},
+
+This is a gentle reminder regarding our previous email.
+
+Looking forward to your response.
+
+Best regards,`
+      ]
+    },
+
+    direct: {
+      subject: [
+        "Follow-up",
+        "Update?",
+        "Status check",
+        "Reminder",
+        "Feedback needed"
+      ],
+      body: [
+
+`Hi {company},
+
+Any update on {product}?
+
+Thanks.`,
+
+`Hi {company},
+
+Following up. Please share feedback.
+
+Thanks.`,
+
+`Hi {company},
+
+Checking status.
+
+Thanks.`,
+
+`Hi {company},
+
+Quick reminder.
+
+Thanks.`,
+
+`Hi {company},
+
+Let me know.
+
+Thanks.`
+      ]
     }
   }
 };
 
-function generate() {
+function randomPick(arr){
+  return arr[Math.floor(Math.random()*arr.length)];
+}
 
+function generate(){
+
+  const situation = document.getElementById("situation").value;
+  const tone = document.getElementById("tone").value;
   const myCompany = document.getElementById("myCompany").value || "our company";
   const company = document.getElementById("company").value || "your company";
   const product = document.getElementById("product").value || "product";
 
   const category = categoryMap[document.getElementById("category").value];
+  const t = templates[situation][tone];
 
-  let subject = templates.first_contact.polite.subject[0];
-  let body = templates.first_contact.polite.body[0];
+  let html = "";
 
-  let text = ("Subject: "+subject+"\n\n"+body)
-    .replace(/{company}/g,company)
-    .replace(/{product}/g,product)
-    .replace(/{myCompany}/g,myCompany)
-    .replace(/{category_term}/g,category.term)
-    .replace(/{category_extra}/g,category.extra);
+  for(let i=0;i<5;i++){
 
-  document.getElementById("result").innerHTML =
-    `<div class="card">${text.replace(/\n/g,"<br>")}
-    <button class="copy" onclick="copyText(\`${text}\`)">Copy</button></div>`;
+    let subject = randomPick(t.subject);
+    let body = randomPick(t.body);
+
+    let text = ("Subject: "+subject+"\n\n"+body)
+      .replace(/{company}/g,company)
+      .replace(/{product}/g,product)
+      .replace(/{myCompany}/g,myCompany)
+      .replace(/{category_term}/g,category.term)
+      .replace(/{category_extra}/g,category.extra);
+
+    html += `
+      <div class="card">
+        ${text.replace(/\n/g,"<br>")}
+        <button class="copy" onclick="copyText(\`${text}\`)">Copy</button>
+      </div>
+    `;
+  }
+
+  document.getElementById("result").innerHTML = html;
 }
 
-function copyText(text){
-  navigator.clipboard.writeText(text);
-  alert("Copied!");
-}
-
-/* 🔥 AI-like translator (rule-based) */
+/* 번역 (룰 기반) */
 function translateKorean(){
 
   const input = document.getElementById("koreanInput").value;
@@ -165,19 +388,19 @@ function translateKorean(){
 
   if(input.includes("답장")){
     output = "We would appreciate your prompt response.";
-    explanation = "‘답장 부탁’ → direct 대신 polite request로 변환";
+    explanation = "직설 대신 정중한 요청으로 변환";
   }
   else if(input.includes("검토")){
     output = "Please let us know your thoughts after review.";
-    explanation = "검토 요청 → 부담 줄이는 soft 표현";
+    explanation = "부담을 줄이는 표현";
   }
   else if(input.includes("관심")){
     output = "Please let us know if you would be interested.";
-    explanation = "관심 여부 → standard business CTA";
+    explanation = "표준 CTA 표현";
   }
   else{
     output = "We would appreciate your feedback regarding this matter.";
-    explanation = "일반적인 비즈니스 표현으로 변환";
+    explanation = "일반적인 비즈니스 표현";
   }
 
   document.getElementById("aiResult").innerHTML = `
@@ -186,6 +409,11 @@ function translateKorean(){
     <b>Why:</b><br>${explanation}
     </div>
   `;
+}
+
+function copyText(text){
+  navigator.clipboard.writeText(text);
+  alert("Copied!");
 }
 
 </script>
